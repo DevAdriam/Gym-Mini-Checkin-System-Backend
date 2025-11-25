@@ -50,6 +50,17 @@ export interface IAuthUser {
   id: string;
 }
 
+export interface IAdminAuth {
+  id: string;
+  role: string;
+}
+
+export interface IMemberAuth {
+  id: string;
+  memberId?: string;
+  role?: string;
+}
+
 export type PaginationParam = {
   take: number;
   skip: number;
