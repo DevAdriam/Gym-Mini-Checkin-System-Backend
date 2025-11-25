@@ -1,0 +1,18 @@
+name: CI for BDD
+
+on: [push, pull_request]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: generate prisma
+        run: npx prisma generate
+
+      - name: Run ESLint
+        run: npx eslint . --ext .ts
