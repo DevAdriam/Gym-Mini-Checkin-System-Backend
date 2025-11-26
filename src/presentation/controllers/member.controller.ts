@@ -4,9 +4,17 @@ import {
   Get,
   HttpCode,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiBody, ApiOperation, ApiTags } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiBody,
+  ApiOperation,
+  ApiQuery,
+  ApiTags,
+} from '@nestjs/swagger';
+import { CheckMemberStatusDto } from 'src/application/member/dto/check-member-status.dto';
 import { MemberRegisterDto } from 'src/application/member/dto/member-register.dto';
 import { MemberService } from 'src/application/member/member.service';
 import { Member } from 'src/common/decorators/member.decorator';
@@ -35,6 +43,36 @@ export class MemberController {
       }
       throw new BadRequestException({
         message: 'Failed to register member',
+      });
+    }
+  }
+
+  @Get('check-status')
+  @ApiOperation({
+    summary: 'Check if member is registered by email',
+    description:
+      'Public endpoint to check if a member with the given email is registered. Returns member status if found.',
+  })
+  @ApiQuery({
+    name: 'email',
+    required: true,
+    type: String,
+    description: 'Member email address',
+    example: 'john.doe@example.com',
+  })
+  @HttpCode(200)
+  async checkMemberStatus(@Query() dto: CheckMemberStatusDto) {
+    try {
+      const result = await this.memberService.checkMemberStatus(dto.email);
+      return result;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException({
+          message: error.message,
+        });
+      }
+      throw new BadRequestException({
+        message: 'Failed to check member status',
       });
     }
   }

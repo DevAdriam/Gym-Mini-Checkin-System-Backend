@@ -36,7 +36,7 @@ import { StorageService } from 'src/infrastructure/storage/storage.service';
 @ApiTags('Admin - Images')
 @Controller()
 @ApiBearerAuth()
-@UseGuards(AdminJWTAuthGuard)
+// @UseGuards(AdminJWTAuthGuard)
 export class ImageController {
   private readonly maxFileSize: number;
 

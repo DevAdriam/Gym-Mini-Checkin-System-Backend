@@ -11,4 +11,7 @@ export interface CheckInRepositoryInterface {
     limit: number,
   ): Promise<{ checkIns: any[]; total: number }>;
   create(data: any): Promise<any | null>;
+  findLatestCheckIn(memberId: string): Promise<any | null>;
+  findLatestCheckInRecord(memberId: string): Promise<any | null>;
+  updateCheckOut(checkInLogId: string, checkOutTime: Date): Promise<any | null>;
 }

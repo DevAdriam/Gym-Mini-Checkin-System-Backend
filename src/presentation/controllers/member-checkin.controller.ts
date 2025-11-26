@@ -4,7 +4,7 @@ import { CheckInService } from 'src/application/checkin/checkin.service';
 import { MemberCheckInDto } from 'src/application/checkin/dto/member-checkin.dto';
 import { BadRequestException } from 'src/core/exceptions/http/bad-request.exception';
 
-@ApiTags('Check-in')
+@ApiTags('Check-in / Check-out')
 @Controller('checkin')
 export class MemberCheckInController {
   constructor(private readonly checkInService: CheckInService) {}
@@ -29,6 +29,30 @@ export class MemberCheckInController {
       }
       throw new BadRequestException({
         message: 'Failed to process check-in',
+      });
+    }
+  }
+
+  @Post('checkout')
+  @ApiOperation({
+    summary: 'Member attempts to check out (via memberId)',
+    description:
+      'Finds the latest active check-in for the member and records the checkout time. Returns checkout details including duration.',
+  })
+  @ApiBody({ type: MemberCheckInDto })
+  @HttpCode(200)
+  async checkOut(@Body() dto: MemberCheckInDto) {
+    try {
+      const result = await this.checkInService.checkOut(dto);
+      return result;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException({
+          message: error.message,
+        });
+      }
+      throw new BadRequestException({
+        message: 'Failed to process checkout',
       });
     }
   }

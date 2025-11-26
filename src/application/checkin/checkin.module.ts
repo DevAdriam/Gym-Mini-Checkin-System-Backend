@@ -5,6 +5,6 @@ import { CheckInService } from './checkin.service';
 
 @Module({
   providers: [CheckInService, CheckInRepository, MemberRepository],
-  exports: [CheckInService],
+  exports: [CheckInService, CheckInRepository],
 })
 export class CheckInModule {}

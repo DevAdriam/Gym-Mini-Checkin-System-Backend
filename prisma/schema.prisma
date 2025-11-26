@@ -101,6 +101,7 @@ model CheckInLog {
   id          String          @id @default(uuid())
   memberId    String          @map("member_id")
   checkInTime DateTime        @default(now()) @map("check_in_time")
+  checkOutTime DateTime?      @map("check_out_time")
   status      CHECKIN_STATUS
   reason      String?
 

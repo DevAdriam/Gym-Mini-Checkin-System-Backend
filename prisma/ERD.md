@@ -93,6 +93,7 @@ REJECTED REJECTED
     String id "🗝️"
     String member_id 
     DateTime check_in_time 
+    DateTime check_out_time "❓"
     CHECKIN_STATUS status 
     String reason "❓"
     DateTime created_at 

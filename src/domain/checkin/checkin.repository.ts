@@ -125,4 +125,63 @@ export class CheckInRepository implements CheckInRepositoryInterface {
       },
     });
   }
+
+  async findLatestCheckIn(memberId: string): Promise<any | null> {
+    return await this.databaseService.checkInLog.findFirst({
+      where: {
+        memberId,
+        status: 'ALLOWED',
+        checkOutTime: null, // Only find check-ins that haven't been checked out
+      },
+      include: {
+        member: {
+          include: {
+            membershipPackage: true,
+          },
+        },
+      },
+      orderBy: {
+        checkInTime: 'desc',
+      },
+    });
+  }
+
+  async findLatestCheckInRecord(memberId: string): Promise<any | null> {
+    return await this.databaseService.checkInLog.findFirst({
+      where: {
+        memberId,
+      },
+      include: {
+        member: {
+          include: {
+            membershipPackage: true,
+          },
+        },
+      },
+      orderBy: {
+        checkInTime: 'desc',
+      },
+    });
+  }
+
+  async updateCheckOut(
+    checkInLogId: string,
+    checkOutTime: Date,
+  ): Promise<any | null> {
+    return await this.databaseService.checkInLog.update({
+      where: {
+        id: checkInLogId,
+      },
+      data: {
+        checkOutTime,
+      },
+      include: {
+        member: {
+          include: {
+            membershipPackage: true,
+          },
+        },
+      },
+    });
+  }
 }

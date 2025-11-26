@@ -16,7 +16,7 @@ import { AdminJWTAuthGuard } from 'src/infrastructure/auth/guard/admin-jwt.guard
 @ApiTags('Admin - Check-ins')
 @Controller()
 @ApiBearerAuth()
-@UseGuards(AdminJWTAuthGuard)
+// @UseGuards(AdminJWTAuthGuard)
 export class CheckInController {
   constructor(private readonly checkInService: CheckInService) {}
 

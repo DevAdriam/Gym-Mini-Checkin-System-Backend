@@ -52,6 +52,29 @@ export class MemberGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   /**
+   * Emit event when a member is approved
+   */
+  emitMemberApproved(member: any) {
+    this.logger.log(`Emitting member approved event for: ${member.memberId}`);
+    this.server.to('admin-room').emit('member:approved', {
+      event: 'member:approved',
+      data: {
+        id: member.id,
+        memberId: member.memberId,
+        name: member.name,
+        email: member.email,
+        phone: member.phone,
+        status: member.status,
+        startDate: member.startDate,
+        endDate: member.endDate,
+        membershipPackage: member.membershipPackage,
+        approvedAt: new Date().toISOString(),
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }
+
+  /**
    * Emit event when a member status is updated
    */
   emitMemberStatusUpdated(member: any) {

@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { BadRequestException } from 'src/core/exceptions/http/bad-request.exception';
 import { NotFoundException } from 'src/core/exceptions/http/not-found.exception';
+import { CheckInRepository } from 'src/domain/checkin/checkin.repository';
 import { MemberRepository } from 'src/domain/member/member.repository';
 import { Env } from 'src/infrastructure/config/env.config';
 import { PrismaService } from 'src/infrastructure/database/prisma.service';
@@ -18,6 +19,7 @@ export class MemberService {
     private readonly configService: ConfigService<Env>,
     @Inject(forwardRef(() => MemberGateway))
     private readonly memberGateway: MemberGateway,
+    private readonly checkInRepository: CheckInRepository,
   ) {}
 
   async register(dto: MemberRegisterDto) {
@@ -106,6 +108,76 @@ export class MemberService {
     return member;
   }
 
+  async checkMemberStatus(email: string) {
+    const member = await this.memberRepository.findByEmail(email);
+
+    if (!member) {
+      return {
+        registered: false,
+        message: 'Member not found with this email',
+      };
+    }
+
+    // Check if member is soft-deleted
+    if (member.deletedAt) {
+      return {
+        registered: false,
+        message: 'Member account has been deleted',
+        deletedAt: member.deletedAt,
+      };
+    }
+
+    // Check the latest check-in record to determine current check-in status
+    const latestCheckIn = await this.checkInRepository.findLatestCheckInRecord(
+      member.id,
+    );
+
+    let currentCheckInStatus:
+      | 'checked_in'
+      | 'checked_out'
+      | 'never_checked_in' = 'never_checked_in';
+    let currentCheckIn: any = null;
+
+    if (latestCheckIn) {
+      if (
+        latestCheckIn.checkOutTime === null &&
+        latestCheckIn.status === 'ALLOWED'
+      ) {
+        currentCheckInStatus = 'checked_in';
+        currentCheckIn = {
+          id: latestCheckIn.id,
+          checkInTime: latestCheckIn.checkInTime,
+          status: latestCheckIn.status,
+        };
+      } else {
+        currentCheckInStatus = 'checked_out';
+        currentCheckIn = {
+          id: latestCheckIn.id,
+          checkInTime: latestCheckIn.checkInTime,
+          checkOutTime: latestCheckIn.checkOutTime,
+          status: latestCheckIn.status,
+        };
+      }
+    }
+
+    return {
+      registered: true,
+      member: {
+        id: member.id,
+        memberId: member.memberId,
+        name: member.name,
+        email: member.email,
+        phone: member.phone,
+        status: member.status,
+        startDate: member.startDate,
+        endDate: member.endDate,
+        membershipPackage: member.membershipPackage,
+      },
+      currentCheckInStatus,
+      currentCheckIn,
+    };
+  }
+
   async getProfileById(id: string) {
     const member = await this.memberRepository.findById(id);
     if (!member) {
@@ -174,11 +246,11 @@ export class MemberService {
       });
     }
 
-    // Emit WebSocket event for member status update
+    // Emit WebSocket event for member approval
     try {
-      this.memberGateway.emitMemberStatusUpdated(updatedMember);
+      this.memberGateway.emitMemberApproved(updatedMember);
     } catch (error) {
-      console.error('Failed to emit member status updated event:', error);
+      console.error('Failed to emit member approved event:', error);
     }
 
     return updatedMember;
