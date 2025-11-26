@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { BadRequestException } from 'src/core/exceptions/http/bad-request.exception';
@@ -6,6 +6,7 @@ import { NotFoundException } from 'src/core/exceptions/http/not-found.exception'
 import { MemberRepository } from 'src/domain/member/member.repository';
 import { Env } from 'src/infrastructure/config/env.config';
 import { PrismaService } from 'src/infrastructure/database/prisma.service';
+import { MemberGateway } from 'src/infrastructure/websocket/member.gateway';
 import { MemberRegisterDto } from './dto/member-register.dto';
 
 @Injectable()
@@ -15,6 +16,8 @@ export class MemberService {
     private readonly prismaService: PrismaService,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<Env>,
+    @Inject(forwardRef(() => MemberGateway))
+    private readonly memberGateway: MemberGateway,
   ) {}
 
   async register(dto: MemberRegisterDto) {
@@ -80,6 +83,14 @@ export class MemberService {
       throw new BadRequestException({
         message: 'Failed to register member',
       });
+    }
+
+    // Emit WebSocket event for new member registration
+    try {
+      this.memberGateway.emitMemberRegistered(member);
+    } catch (error) {
+      // Log error but don't fail the registration
+      console.error('Failed to emit member registered event:', error);
     }
 
     return member;
@@ -163,6 +174,13 @@ export class MemberService {
       });
     }
 
+    // Emit WebSocket event for member status update
+    try {
+      this.memberGateway.emitMemberStatusUpdated(updatedMember);
+    } catch (error) {
+      console.error('Failed to emit member status updated event:', error);
+    }
+
     return updatedMember;
   }
 
@@ -189,6 +207,13 @@ export class MemberService {
       throw new BadRequestException({
         message: 'Failed to reject member',
       });
+    }
+
+    // Emit WebSocket event for member status update
+    try {
+      this.memberGateway.emitMemberStatusUpdated(updatedMember);
+    } catch (error) {
+      console.error('Failed to emit member status updated event:', error);
     }
 
     return updatedMember;

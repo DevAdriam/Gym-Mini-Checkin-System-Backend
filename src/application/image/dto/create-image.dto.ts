@@ -7,13 +7,13 @@ export enum ImageType {
 }
 
 export class CreateImageDto {
-  @ApiProperty({
-    description: 'Image URL',
+  @ApiPropertyOptional({
+    description: 'Image URL (optional if file is uploaded)',
     example: 'https://example.com/image.jpg',
   })
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  imageUrl: string;
+  imageUrl?: string;
 
   @ApiProperty({
     description: 'Image type',

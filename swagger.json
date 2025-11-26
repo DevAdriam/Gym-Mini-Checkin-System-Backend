@@ -1,0 +1,1221 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/api/v1": {
+      "get": {
+        "operationId": "AppController_getHello_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["App"]
+      }
+    },
+    "/api/v1/test-throw": {
+      "get": {
+        "operationId": "AppController_throwEror_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["App"]
+      }
+    },
+    "/api/v1/auth/google": {
+      "get": {
+        "operationId": "AuthController_loginWithGoogle_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"]
+      }
+    },
+    "/api/v1/auth/google/redirect": {
+      "get": {
+        "operationId": "AuthController_googleAuthRedirect_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": ["Auth"]
+      }
+    },
+    "/api/v1/admin/login": {
+      "post": {
+        "operationId": "AdminController_login_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Admin login",
+        "tags": ["Admin"]
+      }
+    },
+    "/api/v1/admin/logout": {
+      "post": {
+        "operationId": "AdminController_logout_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Admin logout",
+        "tags": ["Admin"]
+      }
+    },
+    "/api/v1/admin/profile": {
+      "get": {
+        "operationId": "AdminController_getProfile_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current admin profile",
+        "tags": ["Admin"]
+      },
+      "patch": {
+        "operationId": "AdminController_updateProfile_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update admin profile info",
+        "tags": ["Admin"]
+      }
+    },
+    "/api/v1/admin/password": {
+      "patch": {
+        "operationId": "AdminController_updatePassword_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateAdminPasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update admin password",
+        "tags": ["Admin"]
+      }
+    },
+    "/api/v1/members/register": {
+      "post": {
+        "operationId": "MemberController_register_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberRegisterDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "summary": "Submit a new member registration",
+        "tags": ["Members"]
+      }
+    },
+    "/api/v1/members/profile": {
+      "get": {
+        "operationId": "MemberController_getProfile_v1",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get current member profile",
+        "tags": ["Members"]
+      }
+    },
+    "/api/v1/members": {
+      "get": {
+        "operationId": "AdminMemberController_findAll_v1",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by member status",
+            "schema": {
+              "enum": ["PENDING", "APPROVED", "REJECTED"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "active",
+            "required": false,
+            "in": "query",
+            "description": "Filter by active/expired status",
+            "schema": {
+              "enum": ["ACTIVE", "EXPIRED"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "search",
+            "required": false,
+            "in": "query",
+            "description": "Search by name, email, phone, or memberId",
+            "schema": {
+              "example": "John",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (for pagination)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page (for pagination)",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all members with filters",
+        "tags": ["Admin - Members"]
+      }
+    },
+    "/api/v1/members/{id}": {
+      "get": {
+        "operationId": "AdminMemberController_getMemberDetail_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Member ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get member detail (membership info + images)",
+        "tags": ["Admin - Members"]
+      },
+      "delete": {
+        "operationId": "AdminMemberController_deleteMember_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Member ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft delete member (deletedAt)",
+        "tags": ["Admin - Members"]
+      }
+    },
+    "/api/v1/members/{id}/approve": {
+      "patch": {
+        "operationId": "AdminMemberController_approveMember_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Member ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Approve member registration (sets status = APPROVED, calculates startDate & endDate)",
+        "tags": ["Admin - Members"]
+      }
+    },
+    "/api/v1/members/{id}/reject": {
+      "patch": {
+        "operationId": "AdminMemberController_rejectMember_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Member ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reject member registration (status = REJECTED)",
+        "tags": ["Admin - Members"]
+      }
+    },
+    "/api/v1/members/{id}/restore": {
+      "patch": {
+        "operationId": "AdminMemberController_restoreMember_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Member ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Restore soft-deleted member",
+        "tags": ["Admin - Members"]
+      }
+    },
+    "/api/v1/membership-packages": {
+      "get": {
+        "operationId": "MembershipPackageController_findAll_v1",
+        "parameters": [
+          {
+            "name": "isActive",
+            "required": false,
+            "in": "query",
+            "description": "Filter by active status",
+            "schema": {
+              "example": true,
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all active/inactive membership packages",
+        "tags": ["Admin - Membership Packages"]
+      },
+      "post": {
+        "operationId": "MembershipPackageController_create_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMembershipPackageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Create new membership package",
+        "tags": ["Admin - Membership Packages"]
+      }
+    },
+    "/api/v1/membership-packages/{id}": {
+      "get": {
+        "operationId": "MembershipPackageController_findById_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Membership Package ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get single package details",
+        "tags": ["Admin - Membership Packages"]
+      },
+      "patch": {
+        "operationId": "MembershipPackageController_update_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Membership Package ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMembershipPackageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update membership package",
+        "tags": ["Admin - Membership Packages"]
+      },
+      "delete": {
+        "operationId": "MembershipPackageController_delete_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Membership Package ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Soft delete package (deletedAt)",
+        "tags": ["Admin - Membership Packages"]
+      }
+    },
+    "/api/v1/membership-packages/{id}/status": {
+      "patch": {
+        "operationId": "MembershipPackageController_updateStatus_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Membership Package ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePackageStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Activate / deactivate package (isActive)",
+        "tags": ["Admin - Membership Packages"]
+      }
+    },
+    "/api/v1/membership-packages/{id}/restore": {
+      "patch": {
+        "operationId": "MembershipPackageController_restore_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Membership Package ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Restore soft-deleted package",
+        "tags": ["Admin - Membership Packages"]
+      }
+    },
+    "/api/v1/members/{id}/images": {
+      "get": {
+        "operationId": "ImageController_getMemberImages_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Member ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Get all payment screenshots and profile images for a member",
+        "tags": ["Admin - Images"]
+      },
+      "post": {
+        "description": "Upload an image file or provide an imageUrl. File upload is preferred.",
+        "operationId": "ImageController_addImage_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Member ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary",
+                    "description": "Image file (JPEG, PNG, GIF, WEBP)"
+                  },
+                  "type": {
+                    "type": "string",
+                    "enum": ["PROFILE", "PAYMENT_SCREENSHOT"],
+                    "description": "Image type"
+                  },
+                  "description": {
+                    "type": "string",
+                    "description": "Image description (optional)"
+                  },
+                  "imageUrl": {
+                    "type": "string",
+                    "description": "Image URL (optional if file is uploaded)"
+                  }
+                },
+                "required": ["type"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Add new image (profile or payment screenshot)",
+        "tags": ["Admin - Images"]
+      }
+    },
+    "/api/v1/images/{id}": {
+      "patch": {
+        "operationId": "ImageController_updateImage_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Image ID (UUID or profile-{memberId})",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateImageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Update image metadata (description)",
+        "tags": ["Admin - Images"]
+      },
+      "delete": {
+        "operationId": "ImageController_deleteImage_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Image ID (UUID or profile-{memberId})",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Delete single image",
+        "tags": ["Admin - Images"]
+      }
+    },
+    "/api/v1/checkins": {
+      "get": {
+        "operationId": "CheckInController_findAll_v1",
+        "parameters": [
+          {
+            "name": "memberId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by member ID",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by check-in status",
+            "schema": {
+              "enum": ["ALLOWED", "DENIED"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for date range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01T00:00:00Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for date range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-12-31T23:59:59Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (for pagination)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page (for pagination)",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List all check-in logs (optional filter by member, date range, status)",
+        "tags": ["Admin - Check-ins"]
+      }
+    },
+    "/api/v1/members/{id}/checkins": {
+      "get": {
+        "operationId": "CheckInController_findByMemberId_v1",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Member ID (UUID)",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "memberId",
+            "required": false,
+            "in": "query",
+            "description": "Filter by member ID",
+            "schema": {
+              "example": "550e8400-e29b-41d4-a716-446655440000",
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "description": "Filter by check-in status",
+            "schema": {
+              "enum": ["ALLOWED", "DENIED"],
+              "type": "string"
+            }
+          },
+          {
+            "name": "startDate",
+            "required": false,
+            "in": "query",
+            "description": "Start date for date range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-01-01T00:00:00Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "endDate",
+            "required": false,
+            "in": "query",
+            "description": "End date for date range filter (ISO 8601)",
+            "schema": {
+              "example": "2024-12-31T23:59:59Z",
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "Page number (for pagination)",
+            "schema": {
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "Items per page (for pagination)",
+            "schema": {
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "List check-in logs for a specific member",
+        "tags": ["Admin - Check-ins"]
+      }
+    },
+    "/api/v1/checkin": {
+      "post": {
+        "description": "Validates membership status and creates a check-in log. Returns ALLOWED if membership is approved and not expired, otherwise DENIED with reason.",
+        "operationId": "MemberCheckInController_checkIn_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberCheckInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Member attempts to check in (via memberId)",
+        "tags": ["Check-in"]
+      }
+    }
+  },
+  "info": {
+    "title": "Gym Mini Check-in System API",
+    "description": "API documentation for Gym Mini Check-in System",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "AdminLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Admin email address",
+            "example": "admin@gym.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Admin password",
+            "example": "password123",
+            "minLength": 6
+          }
+        },
+        "required": ["email", "password"]
+      },
+      "UpdateAdminProfileDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Admin name",
+            "example": "John Doe"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Admin phone number",
+            "example": "+1234567890"
+          },
+          "image": {
+            "type": "string",
+            "description": "Admin profile image URL",
+            "example": "https://example.com/image.jpg"
+          }
+        }
+      },
+      "UpdateAdminPasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string",
+            "description": "Current password",
+            "example": "oldPassword123",
+            "minLength": 6
+          },
+          "newPassword": {
+            "type": "string",
+            "description": "New password",
+            "example": "newPassword123",
+            "minLength": 6
+          }
+        },
+        "required": ["currentPassword", "newPassword"]
+      },
+      "PaymentScreenshotDto": {
+        "type": "object",
+        "properties": {
+          "imageUrl": {
+            "type": "string",
+            "description": "Payment screenshot image URL",
+            "example": "https://example.com/payment-screenshot.jpg"
+          },
+          "description": {
+            "type": "string",
+            "description": "Optional description or note about the payment",
+            "example": "Initial membership payment"
+          }
+        },
+        "required": ["imageUrl"]
+      },
+      "MemberRegisterDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Member full name",
+            "example": "John Doe"
+          },
+          "email": {
+            "type": "string",
+            "description": "Member email address",
+            "example": "john.doe@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "description": "Member phone number",
+            "example": "+1234567890"
+          },
+          "profilePhoto": {
+            "type": "string",
+            "description": "Member profile photo URL",
+            "example": "https://example.com/profile.jpg"
+          },
+          "membershipPackageId": {
+            "type": "string",
+            "description": "Membership package ID",
+            "example": "550e8400-e29b-41d4-a716-446655440000"
+          },
+          "paymentScreenshots": {
+            "description": "Payment screenshots",
+            "example": [
+              {
+                "imageUrl": "https://example.com/payment1.jpg",
+                "description": "Initial payment"
+              }
+            ],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PaymentScreenshotDto"
+            }
+          }
+        },
+        "required": ["name", "membershipPackageId", "paymentScreenshots"]
+      },
+      "CreateMembershipPackageDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Package title",
+            "example": "Monthly Membership"
+          },
+          "description": {
+            "type": "string",
+            "description": "Package description",
+            "example": "Access to all gym facilities for one month"
+          },
+          "price": {
+            "type": "number",
+            "description": "Package price",
+            "example": 50000
+          },
+          "durationDays": {
+            "type": "number",
+            "description": "Duration in days",
+            "example": 30
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "Sort order for display",
+            "example": 1,
+            "default": 0
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "Whether package is active",
+            "example": true,
+            "default": true
+          }
+        },
+        "required": ["title", "price", "durationDays"]
+      },
+      "UpdateMembershipPackageDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Package title",
+            "example": "Monthly Membership"
+          },
+          "description": {
+            "type": "string",
+            "description": "Package description",
+            "example": "Access to all gym facilities for one month"
+          },
+          "price": {
+            "type": "number",
+            "description": "Package price",
+            "example": 50000
+          },
+          "durationDays": {
+            "type": "number",
+            "description": "Duration in days",
+            "example": 30
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "Sort order for display",
+            "example": 1
+          }
+        }
+      },
+      "UpdatePackageStatusDto": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean",
+            "description": "Package active status",
+            "example": true
+          }
+        },
+        "required": ["isActive"]
+      },
+      "UpdateImageDto": {
+        "type": "object",
+        "properties": {
+          "description": {
+            "type": "string",
+            "description": "Image description or note",
+            "example": "Updated payment screenshot"
+          }
+        }
+      },
+      "MemberCheckInDto": {
+        "type": "object",
+        "properties": {
+          "memberId": {
+            "type": "string",
+            "description": "Member ID (e.g., MEM-20240101-ABC12)",
+            "example": "MEM-20240101-ABC12"
+          }
+        },
+        "required": ["memberId"]
+      }
+    }
+  }
+}

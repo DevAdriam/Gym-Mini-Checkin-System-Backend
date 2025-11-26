@@ -8,6 +8,8 @@ import {
 } from '@nestjs/swagger';
 import { CheckInService } from 'src/application/checkin/checkin.service';
 import { CheckInFilterDto } from 'src/application/checkin/dto/checkin-filter.dto';
+import { Pagination } from 'src/common/decorators/pagination.decorator';
+import { PaginationParam } from 'src/common/types/type';
 import { BadRequestException } from 'src/core/exceptions/http/bad-request.exception';
 import { AdminJWTAuthGuard } from 'src/infrastructure/auth/guard/admin-jwt.guard';
 
@@ -29,16 +31,19 @@ export class CheckInController {
   @ApiQuery({ name: 'endDate', required: false, type: String })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  async findAll(@Query() filterDto: CheckInFilterDto) {
+  async findAll(
+    @Query() filterDto: CheckInFilterDto,
+    @Pagination() pagination: PaginationParam & { page: number; limit: number },
+  ) {
     try {
       const result = await this.checkInService.findAll(filterDto);
       return {
         data: result.checkIns,
         pagination: {
-          page: filterDto.page || 1,
-          limit: filterDto.limit || 10,
+          page: pagination.page,
+          limit: pagination.limit,
           total: result.total,
-          totalPages: Math.ceil(result.total / (filterDto.limit || 10)),
+          totalPages: Math.ceil(result.total / pagination.limit),
         },
       };
     } catch (error) {
@@ -70,6 +75,7 @@ export class CheckInController {
   async findByMemberId(
     @Param('id') memberId: string,
     @Query() filterDto: CheckInFilterDto,
+    @Pagination() pagination: PaginationParam & { page: number; limit: number },
   ) {
     try {
       const result = await this.checkInService.findByMemberId(
@@ -79,10 +85,10 @@ export class CheckInController {
       return {
         data: result.checkIns,
         pagination: {
-          page: filterDto.page || 1,
-          limit: filterDto.limit || 10,
+          page: pagination.page,
+          limit: pagination.limit,
           total: result.total,
-          totalPages: Math.ceil(result.total / (filterDto.limit || 10)),
+          totalPages: Math.ceil(result.total / pagination.limit),
         },
       };
     } catch (error) {

@@ -17,6 +17,8 @@ import {
 } from '@nestjs/swagger';
 import { MemberFilterDto } from 'src/application/member/dto/member-filter.dto';
 import { MemberService } from 'src/application/member/member.service';
+import { Pagination } from 'src/common/decorators/pagination.decorator';
+import { PaginationParam } from 'src/common/types/type';
 import { BadRequestException } from 'src/core/exceptions/http/bad-request.exception';
 import { AdminJWTAuthGuard } from 'src/infrastructure/auth/guard/admin-jwt.guard';
 
@@ -38,27 +40,28 @@ export class AdminMemberController {
   @ApiQuery({ name: 'search', required: false, type: String })
   @ApiQuery({ name: 'page', required: false, type: Number, example: 1 })
   @ApiQuery({ name: 'limit', required: false, type: Number, example: 10 })
-  async findAll(@Query() filterDto: MemberFilterDto) {
+  async findAll(
+    @Query() filterDto: MemberFilterDto,
+    @Pagination() pagination: PaginationParam & { page: number; limit: number },
+  ) {
     try {
-      const page = filterDto.page || 1;
-      const limit = filterDto.limit || 10;
       const result = await this.memberService.findAll(
         {
           status: filterDto.status,
           active: filterDto.active,
           search: filterDto.search,
         },
-        page,
-        limit,
+        pagination.page,
+        pagination.limit,
       );
 
       return {
         data: result.members,
         pagination: {
-          page,
-          limit,
+          page: pagination.page,
+          limit: pagination.limit,
           total: result.total,
-          totalPages: Math.ceil(result.total / limit),
+          totalPages: Math.ceil(result.total / pagination.limit),
         },
       };
     } catch (error) {

@@ -29,7 +29,6 @@ import { AdminJWTAuthGuard } from 'src/infrastructure/auth/guard/admin-jwt.guard
 @ApiTags('Admin - Membership Packages')
 @Controller('membership-packages')
 @ApiBearerAuth()
-@UseGuards(AdminJWTAuthGuard)
 export class MembershipPackageController {
   constructor(
     private readonly membershipPackageService: MembershipPackageService,
@@ -62,6 +61,7 @@ export class MembershipPackageController {
   }
 
   @Get(':id')
+  @UseGuards(AdminJWTAuthGuard)
   @ApiOperation({ summary: 'Get single package details' })
   @ApiParam({
     name: 'id',
@@ -85,6 +85,7 @@ export class MembershipPackageController {
   }
 
   @Post()
+  @UseGuards(AdminJWTAuthGuard)
   @ApiOperation({ summary: 'Create new membership package' })
   @ApiBody({ type: CreateMembershipPackageDto })
   @HttpCode(201)
@@ -105,6 +106,7 @@ export class MembershipPackageController {
   }
 
   @Patch(':id')
+  @UseGuards(AdminJWTAuthGuard)
   @ApiOperation({ summary: 'Update membership package' })
   @ApiParam({
     name: 'id',
@@ -133,6 +135,7 @@ export class MembershipPackageController {
   }
 
   @Patch(':id/status')
+  @UseGuards(AdminJWTAuthGuard)
   @ApiOperation({
     summary: 'Activate / deactivate package (isActive)',
   })
@@ -166,6 +169,7 @@ export class MembershipPackageController {
   }
 
   @Delete(':id')
+  @UseGuards(AdminJWTAuthGuard)
   @ApiOperation({ summary: 'Soft delete package (deletedAt)' })
   @ApiParam({
     name: 'id',
@@ -190,6 +194,7 @@ export class MembershipPackageController {
   }
 
   @Patch(':id/restore')
+  @UseGuards(AdminJWTAuthGuard)
   @ApiOperation({ summary: 'Restore soft-deleted package' })
   @ApiParam({
     name: 'id',

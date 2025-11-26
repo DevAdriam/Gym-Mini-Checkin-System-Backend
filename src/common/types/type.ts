@@ -64,6 +64,8 @@ export interface IMemberAuth {
 export type PaginationParam = {
   take: number;
   skip: number;
+  page?: number;
+  limit?: number;
 };
 
 export interface IProductEntity {

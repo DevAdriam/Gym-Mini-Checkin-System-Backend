@@ -14,6 +14,9 @@ export const envSchema = z.object({
   GOOGLE_CLIENT_ID: z.string().nullable().optional(),
   GOOGLE_CLIENT_SECRET: z.string().nullable().optional(),
   GOOGLE_CALLBACK_URL: z.string().nullable().optional(),
+  UPLOAD_DIR: z.string().default('uploads'),
+  MAX_FILE_SIZE: z.string().default('5242880').transform(Number), // 5MB in bytes
+  BASE_URL: z.string().nullable().optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

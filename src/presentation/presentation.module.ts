@@ -6,6 +6,7 @@ import { ImageModule } from 'src/application/image/image.module';
 import { MemberModule } from 'src/application/member/member.module';
 import { MembershipPackageModule } from 'src/application/membership-package/membership-package.module';
 import { UserModule } from 'src/application/user/user.module';
+import { StorageModule } from 'src/infrastructure/storage/storage.module';
 import { AdminMemberController } from './controllers/admin-member.controller';
 import { AdminController } from './controllers/admin.controller';
 import { AuthController } from './controllers/auth.controller';
@@ -25,6 +26,7 @@ import { UserController } from './controllers/user.controller';
     MembershipPackageModule,
     ImageModule,
     CheckInModule,
+    StorageModule,
   ],
   controllers: [
     UserController,
