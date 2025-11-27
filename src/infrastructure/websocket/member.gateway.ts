@@ -56,7 +56,7 @@ export class MemberGateway implements OnGatewayConnection, OnGatewayDisconnect {
    */
   emitMemberApproved(member: any) {
     this.logger.log(`Emitting member approved event for: ${member.memberId}`);
-    this.server.to('admin-room').emit('member:approved', {
+    const eventData = {
       event: 'member:approved',
       data: {
         id: member.id,
@@ -71,28 +71,48 @@ export class MemberGateway implements OnGatewayConnection, OnGatewayDisconnect {
         approvedAt: new Date().toISOString(),
       },
       timestamp: new Date().toISOString(),
-    });
+    };
+
+    // Emit to admin room
+    this.server.to('admin-room').emit('member:approved', eventData);
+    // Emit to member's personal room
+    this.server.to(`member:${member.id}`).emit('member:approved', eventData);
   }
 
   /**
-   * Emit event when a member status is updated
+   * Emit event when a member is rejected
    */
-  emitMemberStatusUpdated(member: any) {
-    this.logger.log(
-      `Emitting member status updated event for: ${member.memberId}`,
-    );
-    this.server.to('admin-room').emit('member:status-updated', {
-      event: 'member:status-updated',
+  emitMemberRejected(member: any) {
+    this.logger.log(`Emitting member rejected event for: ${member.memberId}`);
+    const eventData = {
+      event: 'member:rejected',
       data: {
         id: member.id,
         memberId: member.memberId,
         name: member.name,
+        email: member.email,
+        phone: member.phone,
         status: member.status,
-        startDate: member.startDate,
-        endDate: member.endDate,
+        rejectedAt: new Date().toISOString(),
       },
       timestamp: new Date().toISOString(),
-    });
+    };
+
+    // Emit to admin room
+    this.server.to('admin-room').emit('member:rejected', eventData);
+    // Emit to member's personal room
+    this.server.to(`member:${member.id}`).emit('member:rejected', eventData);
+  }
+
+  /**
+   * Emit event when a member is approved or rejected (backward compatibility)
+   */
+  emitMemberApprovalStatusChanged(member: any) {
+    if (member.status === 'APPROVED') {
+      this.emitMemberApproved(member);
+    } else if (member.status === 'REJECTED') {
+      this.emitMemberRejected(member);
+    }
   }
 
   /**
@@ -105,6 +125,27 @@ export class MemberGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return {
       event: 'subscribed',
       message: 'Successfully subscribed to member events',
+    };
+  }
+
+  /**
+   * Handle member subscription to their own events
+   */
+  @SubscribeMessage('subscribe:member-events')
+  handleMemberSubscribe(client: Socket, payload: { memberId: string }) {
+    if (payload?.memberId) {
+      client.join(`member:${payload.memberId}`);
+      this.logger.log(
+        `Client ${client.id} subscribed to member events for: ${payload.memberId}`,
+      );
+      return {
+        event: 'subscribed',
+        message: `Successfully subscribed to events for member ${payload.memberId}`,
+      };
+    }
+    return {
+      event: 'error',
+      message: 'memberId is required',
     };
   }
 

@@ -11,6 +11,7 @@ import { ResponseInterceptor } from './core/interceptors/response.interceptor';
 import { ConfigModule } from './infrastructure/config/config.module';
 import { PrismaModule } from './infrastructure/database/prisma.module';
 import { MailModule } from './infrastructure/mail/mail.module';
+import { SchedulerModule } from './infrastructure/scheduler/scheduler.module';
 import { StorageModule } from './infrastructure/storage/storage.module';
 import { WebSocketModule } from './infrastructure/websocket/websocket.module';
 import { AppController } from './presentation/controllers/app.controller';
@@ -26,6 +27,7 @@ import { PresentationModule } from './presentation/presentation.module';
     PrismaModule,
     StorageModule,
     WebSocketModule,
+    SchedulerModule,
   ],
   controllers: [AppController],
   providers: [

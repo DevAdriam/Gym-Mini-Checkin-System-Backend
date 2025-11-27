@@ -1,13 +1,16 @@
 import { Injectable, Inject, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
+import { HashService } from 'src/common/service/hash.service';
 import { BadRequestException } from 'src/core/exceptions/http/bad-request.exception';
 import { NotFoundException } from 'src/core/exceptions/http/not-found.exception';
+import { UnauthorizedException } from 'src/core/exceptions/http/unauthorized.exception';
 import { CheckInRepository } from 'src/domain/checkin/checkin.repository';
 import { MemberRepository } from 'src/domain/member/member.repository';
 import { Env } from 'src/infrastructure/config/env.config';
 import { PrismaService } from 'src/infrastructure/database/prisma.service';
 import { MemberGateway } from 'src/infrastructure/websocket/member.gateway';
+import { MemberLoginDto } from './dto/member-login.dto';
 import { MemberRegisterDto } from './dto/member-register.dto';
 
 @Injectable()
@@ -20,16 +23,10 @@ export class MemberService {
     @Inject(forwardRef(() => MemberGateway))
     private readonly memberGateway: MemberGateway,
     private readonly checkInRepository: CheckInRepository,
+    private readonly hashService: HashService,
   ) {}
 
   async register(dto: MemberRegisterDto) {
-    // Validate that either email or phone is provided
-    if (!dto.email && !dto.phone) {
-      throw new BadRequestException({
-        message: 'Either email or phone must be provided',
-      });
-    }
-
     // Check if membership package exists and is active
     const membershipPackage =
       await this.prismaService.membershipPackage.findFirst({
@@ -46,25 +43,28 @@ export class MemberService {
       });
     }
 
-    // Check for duplicate email if provided
-    if (dto.email) {
-      const existingMember = await this.memberRepository.findByEmail(dto.email);
-      if (existingMember) {
-        throw new BadRequestException({
-          message: 'Member with this email already exists',
-        });
-      }
+    // Check for duplicate email
+    const existingMember = await this.memberRepository.findByEmail(dto.email);
+    if (existingMember) {
+      throw new BadRequestException({
+        message: 'Member with this email already exists',
+      });
     }
 
     // Check for duplicate phone if provided
     if (dto.phone) {
-      const existingMember = await this.memberRepository.findByPhone(dto.phone);
-      if (existingMember) {
+      const existingMemberByPhone = await this.memberRepository.findByPhone(
+        dto.phone,
+      );
+      if (existingMemberByPhone) {
         throw new BadRequestException({
           message: 'Member with this phone already exists',
         });
       }
     }
+
+    // Hash password
+    const hashedPassword = await this.hashService.hash(dto.password);
 
     // Generate unique memberId (you can customize this logic)
     const memberId = await this.generateUniqueMemberId();
@@ -73,6 +73,7 @@ export class MemberService {
     const member = await this.memberRepository.create({
       name: dto.name,
       email: dto.email,
+      password: hashedPassword,
       phone: dto.phone,
       profilePhoto: dto.profilePhoto,
       memberId,
@@ -96,6 +97,57 @@ export class MemberService {
     }
 
     return member;
+  }
+
+  async login(dto: MemberLoginDto) {
+    const member = await this.memberRepository.findByEmail(dto.email);
+    if (!member) {
+      throw new NotFoundException({
+        message: 'Member not found',
+      });
+    }
+
+    // Check if member is deleted
+    if (member.deletedAt) {
+      throw new UnauthorizedException({
+        message: 'Member account is deleted',
+      });
+    }
+
+    // Check if member is approved
+    if (member.status !== 'APPROVED') {
+      throw new UnauthorizedException({
+        message: 'Member account is not approved',
+      });
+    }
+
+    // Check if password exists
+    if (!member.password) {
+      throw new UnauthorizedException({
+        message: 'Password not set. Please contact support.',
+      });
+    }
+
+    // Verify password
+    const verifyPassword = await this.hashService.compare(
+      dto.password,
+      member.password,
+    );
+
+    if (!verifyPassword) {
+      throw new UnauthorizedException({
+        message: 'Invalid email or password',
+      });
+    }
+
+    // Generate JWT token
+    const accessToken = await this.generateToken({
+      id: member.id,
+      memberId: member.memberId,
+      role: 'member',
+    });
+
+    return { accessToken, member };
   }
 
   async getProfile(memberId: string) {
@@ -186,6 +238,47 @@ export class MemberService {
       });
     }
     return member;
+  }
+
+  async cancelSubscription(memberId: string) {
+    const member = await this.memberRepository.findById(memberId);
+    if (!member) {
+      throw new NotFoundException({
+        message: 'Member not found',
+      });
+    }
+
+    // Check if member is already approved
+    if (member.status !== 'APPROVED') {
+      throw new BadRequestException({
+        message: 'Only approved members can cancel their subscription',
+      });
+    }
+
+    // Check if subscription is already expired or cancelled
+    if (member.endDate && new Date(member.endDate) <= new Date()) {
+      throw new BadRequestException({
+        message: 'Subscription is already expired',
+      });
+    }
+
+    // Set endDate to current date to cancel the subscription
+    const cancelledDate = new Date();
+    const updatedMember = await this.memberRepository.update(memberId, {
+      endDate: cancelledDate,
+    });
+
+    if (!updatedMember) {
+      throw new BadRequestException({
+        message: 'Failed to cancel subscription',
+      });
+    }
+
+    return {
+      message: 'Subscription cancelled successfully',
+      member: updatedMember,
+      cancelledAt: cancelledDate,
+    };
   }
 
   async findAll(filters: any, page = 1, limit = 10) {
@@ -281,11 +374,11 @@ export class MemberService {
       });
     }
 
-    // Emit WebSocket event for member status update
+    // Emit WebSocket event for member rejection
     try {
-      this.memberGateway.emitMemberStatusUpdated(updatedMember);
+      this.memberGateway.emitMemberRejected(updatedMember);
     } catch (error) {
-      console.error('Failed to emit member status updated event:', error);
+      console.error('Failed to emit member rejected event:', error);
     }
 
     return updatedMember;
@@ -344,6 +437,18 @@ export class MemberService {
   verifyToken(token: string): Promise<Record<string, unknown>> {
     return this.jwtService.verify(token, {
       secret: this.configService.get<string>('JWT_SECRET_KEY'),
+    });
+  }
+
+  private async generateToken(payload: {
+    id: string;
+    memberId?: string;
+    role: string;
+  }): Promise<string> {
+    return await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_SECRET_KEY'),
+      expiresIn:
+        this.configService.get<string>('TOKEN_EXPIRATION_TIME') || '7d',
     });
   }
 

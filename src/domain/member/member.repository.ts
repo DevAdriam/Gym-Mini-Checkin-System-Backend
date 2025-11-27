@@ -58,6 +58,7 @@ export class MemberRepository implements MemberRepositoryInterface {
       data: {
         name: data.name,
         email: data.email,
+        password: data.password,
         phone: data.phone,
         profilePhoto: data.profilePhoto,
         memberId: data.memberId,

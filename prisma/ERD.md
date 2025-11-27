@@ -53,6 +53,7 @@ REJECTED REJECTED
     String name 
     String phone "❓"
     String email "❓"
+    String password "❓"
     String profile_photo "❓"
     String member_id 
     MEMBER_STATUS status 

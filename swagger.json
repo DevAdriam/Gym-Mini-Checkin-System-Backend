@@ -185,6 +185,54 @@
         "tags": ["Members"]
       }
     },
+    "/api/v1/members/login": {
+      "post": {
+        "operationId": "MemberController_login_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Member login with email and password",
+        "tags": ["Members"]
+      }
+    },
+    "/api/v1/members/check-status": {
+      "get": {
+        "description": "Public endpoint to check if a member with the given email is registered. Returns member status if found.",
+        "operationId": "MemberController_checkMemberStatus_v1",
+        "parameters": [
+          {
+            "name": "email",
+            "required": true,
+            "in": "query",
+            "description": "Member email address",
+            "schema": {
+              "example": "john.doe@example.com",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Check if member is registered by email",
+        "tags": ["Members"]
+      }
+    },
     "/api/v1/members/profile": {
       "get": {
         "operationId": "MemberController_getProfile_v1",
@@ -980,7 +1028,31 @@
           }
         },
         "summary": "Member attempts to check in (via memberId)",
-        "tags": ["Check-in"]
+        "tags": ["Check-in / Check-out"]
+      }
+    },
+    "/api/v1/checkin/checkout": {
+      "post": {
+        "description": "Finds the latest active check-in for the member and records the checkout time. Returns checkout details including duration.",
+        "operationId": "MemberCheckInController_checkOut_v1",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MemberCheckInDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Member attempts to check out (via memberId)",
+        "tags": ["Check-in / Check-out"]
       }
     }
   },
@@ -1085,6 +1157,12 @@
             "description": "Member email address",
             "example": "john.doe@example.com"
           },
+          "password": {
+            "type": "string",
+            "description": "Member password",
+            "example": "password123",
+            "minLength": 6
+          },
           "phone": {
             "type": "string",
             "description": "Member phone number",
@@ -1114,7 +1192,30 @@
             }
           }
         },
-        "required": ["name", "membershipPackageId", "paymentScreenshots"]
+        "required": [
+          "name",
+          "email",
+          "password",
+          "membershipPackageId",
+          "paymentScreenshots"
+        ]
+      },
+      "MemberLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "description": "Member email address",
+            "example": "john.doe@example.com"
+          },
+          "password": {
+            "type": "string",
+            "description": "Member password",
+            "example": "password123",
+            "minLength": 6
+          }
+        },
+        "required": ["email", "password"]
       },
       "CreateMembershipPackageDto": {
         "type": "object",

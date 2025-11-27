@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   HttpCode,
+  Patch,
   Post,
   Query,
   UseGuards,
@@ -15,6 +16,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { CheckMemberStatusDto } from 'src/application/member/dto/check-member-status.dto';
+import { MemberLoginDto } from 'src/application/member/dto/member-login.dto';
 import { MemberRegisterDto } from 'src/application/member/dto/member-register.dto';
 import { MemberService } from 'src/application/member/member.service';
 import { Member } from 'src/common/decorators/member.decorator';
@@ -43,6 +45,26 @@ export class MemberController {
       }
       throw new BadRequestException({
         message: 'Failed to register member',
+      });
+    }
+  }
+
+  @Post('login')
+  @ApiOperation({ summary: 'Member login with email and password' })
+  @ApiBody({ type: MemberLoginDto })
+  @HttpCode(200)
+  async login(@Body() dto: MemberLoginDto) {
+    try {
+      const result = await this.memberService.login(dto);
+      return result;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException({
+          message: error.message,
+        });
+      }
+      throw new BadRequestException({
+        message: 'Failed to login',
       });
     }
   }
@@ -93,6 +115,27 @@ export class MemberController {
       }
       throw new BadRequestException({
         message: 'Failed to fetch member profile',
+      });
+    }
+  }
+
+  @Patch('cancel-subscription')
+  @ApiOperation({ summary: 'Cancel member subscription' })
+  @ApiBearerAuth()
+  @UseGuards(MemberJWTAuthGuard)
+  @HttpCode(200)
+  async cancelSubscription(@Member() member: IMemberAuth) {
+    try {
+      const result = await this.memberService.cancelSubscription(member.id);
+      return result;
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException({
+          message: error.message,
+        });
+      }
+      throw new BadRequestException({
+        message: 'Failed to cancel subscription',
       });
     }
   }

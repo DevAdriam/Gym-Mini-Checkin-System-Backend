@@ -54,13 +54,28 @@ export class MembershipPackageService {
       });
     }
 
-    const updatedPackage = await this.membershipPackageRepository.update(id, {
-      title: dto.title,
-      description: dto.description,
-      price: dto.price,
-      durationDays: dto.durationDays,
-      sortOrder: dto.sortOrder,
-    });
+    // Explicitly exclude isActive from update - it should only be updated via updateStatus endpoint
+    const updateData: any = {};
+    if (dto.title !== undefined) {
+      updateData.title = dto.title;
+    }
+    if (dto.description !== undefined) {
+      updateData.description = dto.description;
+    }
+    if (dto.price !== undefined) {
+      updateData.price = dto.price;
+    }
+    if (dto.durationDays !== undefined) {
+      updateData.durationDays = dto.durationDays;
+    }
+    if (dto.sortOrder !== undefined) {
+      updateData.sortOrder = dto.sortOrder;
+    }
+
+    const updatedPackage = await this.membershipPackageRepository.update(
+      id,
+      updateData,
+    );
 
     if (!updatedPackage) {
       throw new BadRequestException({

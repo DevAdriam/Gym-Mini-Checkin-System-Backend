@@ -39,6 +39,7 @@ model Member {
   name                String
   phone               String?
   email               String?
+  password            String?
   profilePhoto        String?                   @map("profile_photo")
 
   memberId            String                    @unique @map("member_id")

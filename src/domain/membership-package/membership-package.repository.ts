@@ -56,15 +56,27 @@ export class MembershipPackageRepository
   }
 
   async update(id: string, data: any): Promise<any | null> {
+    // Explicitly exclude isActive - it should only be updated via updateStatus method
+    const updateData: any = {};
+    if (data.title !== undefined) {
+      updateData.title = data.title;
+    }
+    if (data.description !== undefined) {
+      updateData.description = data.description;
+    }
+    if (data.price !== undefined) {
+      updateData.price = data.price;
+    }
+    if (data.durationDays !== undefined) {
+      updateData.durationDays = data.durationDays;
+    }
+    if (data.sortOrder !== undefined) {
+      updateData.sortOrder = data.sortOrder;
+    }
+
     return await this.databaseService.membershipPackage.update({
       where: { id },
-      data: {
-        title: data.title,
-        description: data.description,
-        price: data.price,
-        durationDays: data.durationDays,
-        sortOrder: data.sortOrder,
-      },
+      data: updateData,
     });
   }
 

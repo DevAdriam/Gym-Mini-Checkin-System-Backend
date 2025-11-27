@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   IsUUID,
+  Min,
   ValidateIf,
 } from 'class-validator';
 
@@ -35,19 +36,28 @@ export class MemberRegisterDto {
   @IsNotEmpty()
   name: string;
 
-  @ApiPropertyOptional({
+  @ApiProperty({
     description: 'Member email address',
     example: 'john.doe@example.com',
   })
-  @ValidateIf((o) => !o.phone || o.email)
   @IsEmail()
-  email?: string;
+  @IsNotEmpty()
+  email: string;
+
+  @ApiProperty({
+    description: 'Member password',
+    example: 'password123',
+    minLength: 6,
+  })
+  @IsString()
+  @IsNotEmpty()
+  password: string;
 
   @ApiPropertyOptional({
     description: 'Member phone number',
     example: '+1234567890',
   })
-  @ValidateIf((o) => !o.email || o.phone)
+  @IsOptional()
   @IsString()
   phone?: string;
 

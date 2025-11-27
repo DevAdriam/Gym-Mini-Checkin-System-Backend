@@ -109,8 +109,14 @@ export class StorageService {
    * Get file URL (for serving files)
    */
   getFileUrl(destination: string, filename: string): string {
-    const baseUrl =
-      this.configService.get<string>('BASE_URL') || 'http://localhost:3000';
+    let baseUrl = this.configService.get<string>('BASE_URL');
+
+    // If BASE_URL is not set, construct it from PORT
+    if (!baseUrl) {
+      const port = this.configService.get<number>('PORT') || 4000;
+      baseUrl = `http://localhost:${port}`;
+    }
+
     return `${baseUrl}/uploads/${destination}/${filename}`;
   }
 
